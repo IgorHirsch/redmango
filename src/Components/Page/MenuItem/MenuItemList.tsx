@@ -2,13 +2,9 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useGetMenuItemsQuery } from "../../../Apis/menuItemApi";
 import { menuItemModel } from "../../../Interfaces";
-import MenuItemCard from "../MenuItem/MenuItemCard";
+import MenuItemCard from "./MenuItemCard";
 import { useDispatch } from "react-redux";
 import { setMenuItem } from "../../../Storage/Redux/menuItemSlice";
-import { MainLoader } from "../Common";
-
-
-
 function MenuItemList() {
   //const [menuItems, setMenuItems] = useState<menuItemModel[]>([]);
   const dispatch = useDispatch();
@@ -21,7 +17,7 @@ function MenuItemList() {
   }, [isLoading]);
 
   if (isLoading) {
-    return <MainLoader />;
+    return <div>Loading...</div>;
   }
 
   return (

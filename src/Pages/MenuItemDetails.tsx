@@ -1,23 +1,43 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useGetMenuItemByIdQuery } from "../Apis/menuItemAPI";
+import { useGetMenuItemByIdQuery } from "../Apis/menuItemApi";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useUpdateShoppingCartMutation } from "../Apis/shoppingCartApi";
+import { MainLoader, MiniLoader } from "../Components/Page/Common";
+
+// User id - c291fa34-fc4c-4387-b955-e84d542a2a9f
 
 function MenuItemDetails() {
-    const { menuItemId } = useParams();
-    const { data, isLoading } = useGetMenuItemByIdQuery(menuItemId);
-    const navigate = useNavigate();
-     const [quantity, setQuantity] = useState(1);
+  const { menuItemId } = useParams();
+  const { data, isLoading } = useGetMenuItemByIdQuery(menuItemId);
+  const navigate = useNavigate();
+  const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false);
+  const [updateShoppingCart] = useUpdateShoppingCartMutation();
 
-     const handleQuantity = (counter: number) => {
-       let newQuantity = quantity + counter;
-       if (newQuantity == 0) {
-         newQuantity = 1;
-       }
-       setQuantity(newQuantity);
-       return;
-     };
+  const handleQuantity = (counter: number) => {
+    let newQuantity = quantity + counter;
+    if (newQuantity == 0) {
+      newQuantity = 1;
+    }
+    setQuantity(newQuantity);
+    return;
+  };
+
+  const handleAddToCart = async (menuItemId: number) => {
+    setIsAddingToCart(true);
+
+    const response = await updateShoppingCart({
+      menuItemId: menuItemId,
+      updateQuantityBy: quantity,
+      userId: "c291fa34-fc4c-4387-b955-e84d542a2a9f",
+    });
+
+    console.log(response);
+    setIsAddingToCart(false);
+  };
+
   return (
     <div className="container pt-4 pt-md-5">
       {!isLoading ? (
@@ -66,9 +86,23 @@ function MenuItemDetails() {
             </span>
             <div className="row pt-4">
               <div className="col-5">
-                <button className="btn btn-success form-control">
-                  Add to Cart
-                </button>
+                {isAddingToCart ? (
+                  <button
+                    disabled
+                    className="btn btn-success form-control"
+                    aria-label="Adding to cart"
+                  >
+                    <MiniLoader />
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-success form-control"
+                    onClick={() => handleAddToCart(data.result?.id)}
+                    aria-label="Add to Cart"
+                  >
+                    Add to Cart
+                  </button>
+                )}
               </div>
 
               <div className="col-5 ">

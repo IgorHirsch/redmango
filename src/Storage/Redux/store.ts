@@ -1,15 +1,26 @@
-import {configureStore} from '@reduxjs/toolkit';
-import {menuItemReducer} from "./menuItemSlice";
-import {menuItemApi} from "../../Apis";
-
+import { configureStore } from "@reduxjs/toolkit";
+import { menuItemReducer } from "./menuItemSlice";
+import { menuItemApi, shoppingCartApi } from "../../Apis";
+import { shoppingCartReducer } from "./shoppingCartSlice";
 
 const store = configureStore({
-    reducer: {
-        menuItemStore: menuItemReducer,
-        [menuItemApi.reducerPath]: menuItemApi.reducer,
-    },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(menuItemApi.middleware),
+
+  
+  reducer: {
+    menuItemStore: menuItemReducer,
+    [menuItemApi.reducerPath]: menuItemApi.reducer,
+
+
+    shoppingCartStore: shoppingCartReducer,
+    [shoppingCartApi.reducerPath]: shoppingCartApi.reducer,
+  },
+
+
+
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware()
+      .concat(menuItemApi.middleware)
+      .concat(shoppingCartApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
