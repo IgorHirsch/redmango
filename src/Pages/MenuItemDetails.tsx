@@ -5,7 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useUpdateShoppingCartMutation } from "../Apis/shoppingCartApi";
 import { MainLoader, MiniLoader } from "../Components/Page/Common";
-
+import { toastNotify } from "../Helper";
+import { apiResponse, userModel } from "../Interfaces";
+import { RootState } from "../Storage/Redux/store";
+import { useSelector } from "react-redux";
 // User id - c291fa34-fc4c-4387-b955-e84d542a2a9f
 
 function MenuItemDetails() {
@@ -15,7 +18,9 @@ function MenuItemDetails() {
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false);
   const [updateShoppingCart] = useUpdateShoppingCartMutation();
-
+  const userData: userModel = useSelector(
+    (state: RootState) => state.userAuthStore
+  );
   const handleQuantity = (counter: number) => {
     let newQuantity = quantity + counter;
     if (newQuantity == 0) {
@@ -26,15 +31,21 @@ function MenuItemDetails() {
   };
 
   const handleAddToCart = async (menuItemId: number) => {
+     if (!userData.id) {
+       navigate("/login");
+       return;
+     }
     setIsAddingToCart(true);
 
-    const response = await updateShoppingCart({
+    const response: apiResponse = await updateShoppingCart({
       menuItemId: menuItemId,
       updateQuantityBy: quantity,
-      userId: "c291fa34-fc4c-4387-b955-e84d542a2a9f",
+      userId: userData.id,
     });
 
-    console.log(response);
+    if (response.data && response.data.isSuccess) {
+      toastNotify("Item added to cart successfully!");
+    }
     setIsAddingToCart(false);
   };
 

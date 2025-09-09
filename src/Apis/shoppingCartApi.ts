@@ -37,6 +37,5 @@ const shoppingCartApi = createApi({
   }),
 });
 
-export const { useGetShoppingCartQuery, useUpdateShoppingCartMutation } =
-  shoppingCartApi;
+export const { useGetShoppingCartQuery, useUpdateShoppingCartMutation } =shoppingCartApi;
 export default shoppingCartApi;

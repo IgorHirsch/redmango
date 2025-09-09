@@ -1,19 +1,40 @@
 import React from "react";
 import { Footer, Header } from "../Components/Layout";
-import { Home, MenuItemDetails, NotFound, ShoppingCart } from "../Pages";
+import {
+  AccessDenied,
+  AuthenticationTest,
+  AuthenticationTestAdmin,
+  Home,
+  MenuItemDetails,
+  NotFound,
+  ShoppingCart,
+  Register,
+  Login,
+} from "../Pages";
 import { Routes, Route } from "react-router-dom";
 
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useGetShoppingCartQuery } from "../Apis/shoppingCartApi";
 import { setShoppingCart } from "../Storage/Redux/shoppingCartSlice";
+import jwt_decode from "jwt-decode";
+import { userModel } from "../Interfaces";
+import { setLoggedInUser } from "../Storage/Redux/userAuthSlice";
+import { RootState } from "../Storage/Redux/store";
 
 function App() {
   const dispatch = useDispatch();
 
-  const { data, isLoading } = useGetShoppingCartQuery(
-    "c291fa34-fc4c-4387-b955-e84d542a2a9f"
-  );
+  const userData = useSelector((state: RootState) => state.userAuthStore);
+  const { data, isLoading } = useGetShoppingCartQuery(userData.id);
+
+   useEffect(() => {
+     const localToken = localStorage.getItem("token");
+     if (localToken) {
+       const { fullName, id, email, role }: userModel = jwt_decode(localToken);
+       dispatch(setLoggedInUser({ fullName, id, email, role }));
+     }
+   }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -28,12 +49,24 @@ function App() {
       <div className="pb-5">
         <Routes>
           <Route path="/" element={<Home />}></Route>
-          <Route path="*" element={<NotFound />}></Route>
           <Route
             path="/menuItemDetails/:menuItemId"
             element={<MenuItemDetails />}
           ></Route>
           <Route path="/shoppingCart" element={<ShoppingCart />}></Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<NotFound />}></Route>
+
+          <Route
+            path="/authentication"
+            element={<AuthenticationTest />}
+          ></Route>
+          <Route
+            path="/authorization"
+            element={<AuthenticationTestAdmin />}
+          ></Route>
+          <Route path="/accessDenied" element={<AccessDenied />} />
         </Routes>
       </div>
       <Footer />
