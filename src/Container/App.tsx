@@ -7,6 +7,7 @@ import {
   Home,
   MenuItemDetails,
   NotFound,
+  Payment,
   ShoppingCart,
   Register,
   Login,
@@ -28,17 +29,16 @@ function App() {
   const userData = useSelector((state: RootState) => state.userAuthStore);
   const { data, isLoading } = useGetShoppingCartQuery(userData.id);
 
-   useEffect(() => {
-     const localToken = localStorage.getItem("token");
-     if (localToken) {
-       const { fullName, id, email, role }: userModel = jwt_decode(localToken);
-       dispatch(setLoggedInUser({ fullName, id, email, role }));
-     }
-   }, []);
+  useEffect(() => {
+    const localToken = localStorage.getItem("token");
+    if (localToken) {
+      const { fullName, id, email, role }: userModel = jwt_decode(localToken);
+      dispatch(setLoggedInUser({ fullName, id, email, role }));
+    }
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
-      console.log(data.result);
       dispatch(setShoppingCart(data.result?.cartItems));
     }
   }, [data]);
@@ -67,6 +67,7 @@ function App() {
             element={<AuthenticationTestAdmin />}
           ></Route>
           <Route path="/accessDenied" element={<AccessDenied />} />
+          <Route path="/payment" element={<Payment />} />
         </Routes>
       </div>
       <Footer />
